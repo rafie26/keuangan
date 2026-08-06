@@ -87,7 +87,7 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="mb-unit-lg text-center">
           <h1 className="text-headline-lg font-headline-lg font-bold text-primary">
-            WealthFlow
+            Keuangan
           </h1>
           <p className="text-label-sm font-label-sm text-on-surface-variant">
             {mode === "login"

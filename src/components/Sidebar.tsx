@@ -12,7 +12,7 @@ export default function Sidebar() {
     <nav className="fixed left-0 top-0 z-50 hidden h-screen w-64 flex-col bg-surface px-unit-md py-unit-lg shadow-[4px_0_12px_rgba(30,58,138,0.08)] md:flex">
       <div className="mb-unit-xl px-unit-sm">
         <h1 className="text-headline-md font-headline-md font-bold text-primary">
-          WealthFlow
+          Keuangan
         </h1>
         <p className="text-label-sm font-label-sm text-on-surface-variant">
           Penasihat Premium

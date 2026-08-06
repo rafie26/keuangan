@@ -8,13 +8,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WealthFlow - Penasihat Keuangan Premium",
+  title: "Keuangan - Penasihat Keuangan Premium",
   description: "Smart Finance & Savings Tracker",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${inter.variable} h-full antialiased`}>
+    <html lang="id" className={`${inter.variable} h-full scroll-smooth antialiased`}>
       <body className="flex min-h-full flex-col">
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link

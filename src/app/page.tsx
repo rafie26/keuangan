@@ -64,7 +64,7 @@ export default function LandingPage() {
               <Icon icon="account_balance" className="text-base" />
             </span>
             <span className="text-headline-sm font-headline-sm font-bold text-primary">
-              WealthFlow
+              Keuangan
             </span>
           </a>
           <div className="flex items-center gap-3">
@@ -85,8 +85,8 @@ export default function LandingPage() {
       </nav>
 
       <section className="relative overflow-hidden pt-28 md:pt-36">
-        <div className="pointer-events-none absolute inset-0 select-none opacity-[0.05]">
-          <p className="font-tabular text-[18rem] leading-none text-primary">
+        <div className="pointer-events-none absolute inset-0 flex select-none justify-end opacity-[0.05]">
+          <p className="mr-6 font-tabular text-[13rem] leading-none text-primary md:text-[18rem]">
             1.9
           </p>
         </div>
@@ -95,13 +95,13 @@ export default function LandingPage() {
             <p className="mb-4 text-label-md font-label-md uppercase tracking-widest text-secondary">
               Penasihat keuangan pribadi Anda
             </p>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-on-surface md:text-5xl">
+            <h1 className="text-balance text-4xl font-bold leading-tight tracking-tight text-on-surface md:text-5xl">
               Keuangan Anda,
               <br />
               jelas dalam{" "}
               <span className="text-primary">satu layar</span>.
             </h1>
-            <p className="mt-5 max-w-md text-body-lg font-body-lg text-on-surface-variant">
+            <p className="mt-5 max-w-md text-pretty text-body-lg font-body-lg text-on-surface-variant">
               Pantau saldo, pemasukan, dan pengeluaran setiap bulan. Satu
               dasbor ringkas untuk mengambil keputusan yang lebih tenang.
             </p>
@@ -199,15 +199,15 @@ export default function LandingPage() {
           <p className="mb-2 text-label-md font-label-md uppercase tracking-widest text-secondary">
             Fitur
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-on-surface md:text-4xl">
-            Semua yang Anda butuhkan untuk menata keuangan
-          </h2>
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-on-surface md:text-4xl">
+              Semua yang Anda butuhkan untuk menata keuangan
+            </h2>
         </div>
         <div className="grid grid-cols-1 gap-gutter md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group rounded-xl bg-surface-container-lowest p-unit-lg card-shadow transition-transform duration-300 hover:-translate-y-1"
+              className="group flex h-full flex-col rounded-xl bg-surface-container-lowest p-unit-lg card-shadow transition-transform duration-300 hover:-translate-y-1"
             >
               <span className="mb-unit-md inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-container/15 text-primary transition-colors group-hover:bg-primary group-hover:text-on-primary">
                 <Icon icon={feature.icon} className="text-xl" />
@@ -215,7 +215,7 @@ export default function LandingPage() {
               <h3 className="mb-2 text-headline-sm font-headline-sm text-on-surface">
                 {feature.title}
               </h3>
-              <p className="text-body-sm font-body-sm text-on-surface-variant">
+              <p className="mt-auto text-pretty text-body-sm font-body-sm text-on-surface-variant">
                 {feature.desc}
               </p>
             </div>
@@ -229,7 +229,7 @@ export default function LandingPage() {
             <p className="mb-2 text-label-md font-label-md uppercase tracking-widest text-secondary">
               Cara mulai
             </p>
-            <h2 className="text-3xl font-bold tracking-tight text-on-surface md:text-4xl">
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-on-surface md:text-4xl">
               Tiga langkah menuju keuangan yang rapi
             </h2>
           </div>
@@ -257,7 +257,7 @@ export default function LandingPage() {
       <section className="mx-auto w-full max-w-6xl px-margin-mobile py-unit-xl md:px-6 md:py-[96px]">
         <div className="rounded-2xl bg-primary p-unit-lg md:p-unit-xl">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-on-primary md:text-4xl">
+            <h2 className="text-balance text-3xl font-bold tracking-tight text-on-primary md:text-4xl">
               Siap mengendalikan keuangan Anda?
             </h2>
             <p className="mt-3 text-body-lg font-body-lg text-on-primary/80">
@@ -282,11 +282,11 @@ export default function LandingPage() {
             <Icon icon="account_balance" className="text-sm" />
           </span>
           <span className="text-label-md font-label-md font-bold text-primary">
-            WealthFlow
+            Keuangan
           </span>
         </div>
         <p className="text-label-sm font-label-sm text-on-surface-variant">
-          Penasihat Premium &middot; &copy; 2026 WealthFlow
+          Penasihat Premium &middot; &copy; 2026 Keuangan
         </p>
       </div>
     </footer>
