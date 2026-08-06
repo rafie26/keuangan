@@ -34,6 +34,11 @@ export function formatRupiah(value: number): string {
   return "Rp " + new Intl.NumberFormat("id-ID").format(value);
 }
 
+export function formatAmountInput(digits: string): string {
+  if (!digits) return "";
+  return Number(digits).toLocaleString("id-ID");
+}
+
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",

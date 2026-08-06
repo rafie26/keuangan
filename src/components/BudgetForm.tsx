@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
+import { formatAmountInput } from "@/lib/transactions";
 import type { CategoryOption } from "./TransactionForm";
 
 export default function BudgetForm({
@@ -96,7 +97,7 @@ export default function BudgetForm({
             type="text"
             inputMode="numeric"
             required
-            value={limit}
+            value={formatAmountInput(limit)}
             onChange={(e) => setLimit(e.target.value.replace(/[^0-9]/g, ""))}
             placeholder="0"
             className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"

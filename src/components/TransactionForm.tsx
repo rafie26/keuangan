@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
 import {
   categoryIconOptions,
+  formatAmountInput,
   type TransactionType,
 } from "@/lib/transactions";
 
@@ -231,7 +232,7 @@ export default function TransactionForm({
             type="text"
             inputMode="numeric"
             required
-            value={amount}
+            value={formatAmountInput(amount)}
             onChange={(e) =>
               setAmount(e.target.value.replace(/[^0-9]/g, ""))
             }

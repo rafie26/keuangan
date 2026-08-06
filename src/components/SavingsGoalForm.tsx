@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
+import { formatAmountInput } from "@/lib/transactions";
 import { goalIcons } from "@/lib/savings";
 
 export default function SavingsGoalForm() {
@@ -109,7 +110,7 @@ export default function SavingsGoalForm() {
             type="text"
             inputMode="numeric"
             required
-            value={target}
+            value={formatAmountInput(target)}
             onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ""))}
             placeholder="0"
             className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -127,7 +128,7 @@ export default function SavingsGoalForm() {
             id="tabungan-awal"
             type="text"
             inputMode="numeric"
-            value={saved}
+            value={formatAmountInput(saved)}
             onChange={(e) => setSaved(e.target.value.replace(/[^0-9]/g, ""))}
             placeholder="0"
             className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"

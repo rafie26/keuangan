@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
 import {
   formatDate,
@@ -16,6 +18,7 @@ export default function TransactionList({
 }: {
   transactions: Transaction[];
 }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered =
@@ -28,6 +31,13 @@ export default function TransactionList({
     { value: "income", label: "Masuk" },
     { value: "expense", label: "Keluar" },
   ];
+
+  async function deleteTransaction(id: string) {
+    if (!window.confirm("Hapus transaksi ini?")) return;
+    const supabase = createClient();
+    await supabase.from("transactions").delete().eq("id", id);
+    router.refresh();
+  }
 
   return (
     <div className="rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
@@ -88,16 +98,25 @@ export default function TransactionList({
                   </p>
                 </div>
               </div>
-              <span
-                className={`text-number-md font-number-md font-tabular ${
-                  t.type === "income"
-                    ? "text-secondary"
-                    : "text-on-surface"
-                }`}
-              >
-                {t.type === "income" ? "+" : "-"}
-                {formatRupiah(Number(t.amount))}
-              </span>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`text-number-md font-number-md font-tabular ${
+                    t.type === "income"
+                      ? "text-secondary"
+                      : "text-on-surface"
+                  }`}
+                >
+                  {t.type === "income" ? "+" : "-"}
+                  {formatRupiah(Number(t.amount))}
+                </span>
+                <button
+                  onClick={() => deleteTransaction(t.id)}
+                  className="rounded-lg p-1.5 text-on-surface-variant transition-colors hover:bg-error-container/40 hover:text-error"
+                  aria-label="Hapus transaksi"
+                >
+                  <Icon icon="delete" className="text-base" />
+                </button>
+              </div>
             </li>
           ))}
         </ul>

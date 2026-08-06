@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
-import { formatRupiah } from "@/lib/transactions";
+import { formatAmountInput, formatRupiah } from "@/lib/transactions";
 import { progressPercent, type SavingsGoal } from "@/lib/savings";
 
 export default function SavingsGoalList({
@@ -111,7 +111,7 @@ export default function SavingsGoalList({
                     type="text"
                     inputMode="numeric"
                     autoFocus
-                    value={amounts[goal.id] ?? ""}
+                    value={formatAmountInput(amounts[goal.id] ?? "")}
                     onChange={(e) =>
                       setAmounts((prev) => ({
                         ...prev,
