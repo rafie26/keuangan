@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Icon from "./Icon";
+import ProfileMenu, { type ProfileUser } from "./ProfileMenu";
 
-export default function TopNav() {
+export default function TopNav({ user }: { user: ProfileUser }) {
   return (
     <header className="fixed right-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-outline-variant/30 bg-surface/80 px-margin-mobile backdrop-blur-md md:w-[calc(100%-16rem)] md:px-margin-desktop">
       <div className="flex flex-1 items-center">
@@ -30,18 +30,7 @@ export default function TopNav() {
         >
           <Icon icon="notifications" />
         </button>
-        <button
-          className="rounded-full p-2 transition-all hover:bg-surface-container focus:ring-2 focus:ring-primary/20"
-          aria-label="Profil"
-        >
-          <Image
-            className="h-8 w-8 rounded-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOzExQkm81pByyqgBDkXDdrP1a_XkJlgCKepdXgkolGT3U0myE6HNXxlbHufTYehwEaHSPTh5TGFGI6GGDkO5-s3MOBESdfwu_0xryHcnSvoyn3LQ6MtutazlRtxqC38O449RUq7GjKRpRGOCjGh4uaHf7LmbaH9Ace2pV8oly-iuvazPw5xIyoAyY4POvAoTYGp8sZ1y4RfpPoFVNhm0KoccTb6MRO8GJJ9XPha0CrcHUkz6MkWWu7Q"
-            alt="Foto profil"
-            width={32}
-            height={32}
-          />
-        </button>
+        <ProfileMenu user={user} />
       </div>
     </header>
   );

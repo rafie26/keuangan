@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
-import LogoutButton from "@/components/LogoutButton";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionList from "@/components/TransactionList";
 import { formatRupiah } from "@/lib/transactions";
@@ -35,14 +34,22 @@ export default async function TransactionsPage() {
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
       <div className="flex h-screen flex-1 flex-col overflow-hidden md:ml-64">
-        <TopNav />
+        <TopNav
+          user={{
+            email: user.email,
+            name:
+              user.user_metadata?.full_name ??
+              user.user_metadata?.name ??
+              undefined,
+            avatarUrl: user.user_metadata?.avatar_url ?? undefined,
+          }}
+        />
         <main className="flex-1 overflow-y-auto px-margin-mobile pb-unit-xl pt-24 md:px-margin-desktop">
           <div className="mx-auto max-w-[1280px]">
-            <div className="mb-unit-lg flex items-center justify-between">
+            <div className="mb-unit-lg">
               <h1 className="text-headline-lg font-headline-lg text-on-surface">
                 Transaksi
               </h1>
-              <LogoutButton />
             </div>
 
             <div className="mb-unit-lg grid grid-cols-1 gap-gutter md:grid-cols-2">
