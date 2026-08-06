@@ -70,9 +70,25 @@ export default function ProfileMenu({ user }: { user: ProfileUser }) {
               </p>
             )}
           </div>
+          <a
+            href="/profil"
+            onClick={() => setOpen(false)}
+            className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-label-md font-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-primary"
+          >
+            <Icon icon="person" className="text-sm" />
+            Profil
+          </a>
+          <a
+            href="/pengaturan"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-label-md font-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-primary"
+          >
+            <Icon icon="settings" className="text-sm" />
+            Pengaturan
+          </a>
           <button
             onClick={handleLogout}
-            className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-label-md font-label-md text-on-surface-variant transition-colors hover:bg-error-container/40 hover:text-error"
+            className="mt-1 flex w-full items-center gap-2 rounded-lg border-t border-outline-variant/30 px-3 py-2 pt-3 text-label-md font-label-md text-on-surface-variant transition-colors hover:bg-error-container/40 hover:text-error"
           >
             <Icon icon="logout" className="text-sm" />
             Keluar

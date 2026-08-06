@@ -4,16 +4,35 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
-import { categories, type TransactionType } from "@/lib/transactions";
+import {
+  categoryIconOptions,
+  type TransactionType,
+} from "@/lib/transactions";
 
-export default function TransactionForm() {
+export interface CategoryOption {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+export default function TransactionForm({
+  categories,
+}: {
+  categories: CategoryOption[];
+}) {
   const router = useRouter();
   const [type, setType] = useState<TransactionType>("expense");
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("Makanan");
+  const [category, setCategory] = useState(categories[0]?.name ?? "");
   const [amount, setAmount] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [newIcon, setNewIcon] = useState("more_horiz");
+  const [categoryPending, setCategoryPending] = useState(false);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,6 +66,32 @@ export default function TransactionForm() {
     setAmount("");
     router.refresh();
     setPending(false);
+  }
+
+  async function handleAddCategory(e: React.FormEvent) {
+    e.preventDefault();
+    setCategoryError(null);
+    if (!newCategory.trim()) {
+      setCategoryError("Nama kategori wajib diisi.");
+      return;
+    }
+    setCategoryPending(true);
+    const supabase = createClient();
+    const { error } = await supabase.from("categories").insert({
+      name: newCategory.trim(),
+      icon: newIcon,
+    });
+    if (error) {
+      setCategoryError(error.message);
+      setCategoryPending(false);
+      return;
+    }
+    setCategory(newCategory.trim());
+    setNewCategory("");
+    setNewIcon("more_horiz");
+    setShowCategoryForm(false);
+    setCategoryPending(false);
+    router.refresh();
   }
 
   return (
@@ -100,24 +145,78 @@ export default function TransactionForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="kategori"
-            className="mb-1 block text-label-sm font-label-sm text-on-surface-variant"
-          >
-            Kategori
-          </label>
-          <select
-            id="kategori"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-body-sm font-body-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            {categories.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <div className="mb-1 flex items-center justify-between">
+            <label
+              htmlFor="kategori"
+              className="block text-label-sm font-label-sm text-on-surface-variant"
+            >
+              Kategori
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowCategoryForm((v) => !v)}
+              className="flex items-center gap-1 text-label-sm font-label-sm text-primary hover:underline"
+            >
+              <Icon icon={showCategoryForm ? "close" : "add"} className="text-sm" />
+              {showCategoryForm ? "Batal" : "Kategori Baru"}
+            </button>
+          </div>
+
+          {showCategoryForm ? (
+            <div className="rounded-lg border border-outline-variant bg-surface-container-low p-3">
+              <div className="mb-2 flex gap-2">
+                <input
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="Nama kategori baru"
+                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCategory}
+                  disabled={categoryPending}
+                  className="shrink-0 rounded-lg bg-primary px-4 py-2 text-label-md font-label-md text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:opacity-60"
+                >
+                  {categoryPending ? "..." : "Simpan"}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {categoryIconOptions.map((icon) => (
+                  <button
+                    key={icon}
+                    type="button"
+                    onClick={() => setNewIcon(icon)}
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+                      newIcon === icon
+                        ? "border-primary bg-primary-container/15 text-primary"
+                        : "border-outline-variant text-on-surface-variant hover:bg-surface-container-high hover:text-primary"
+                    }`}
+                  >
+                    <Icon icon={icon} className="text-base" />
+                  </button>
+                ))}
+              </div>
+              {categoryError && (
+                <p className="mt-2 text-label-sm font-label-sm text-error">
+                  {categoryError}
+                </p>
+              )}
+            </div>
+          ) : (
+            <select
+              id="kategori"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-2.5 text-body-sm font-body-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div>

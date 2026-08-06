@@ -24,12 +24,13 @@ export default function TopNav({ user }: { user: ProfileUser }) {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <button
+        <a
+          href="/notifikasi"
           className="rounded-full p-2 text-on-surface-variant transition-all hover:bg-surface-container focus:ring-2 focus:ring-primary/20"
           aria-label="Notifikasi"
         >
           <Icon icon="notifications" />
-        </button>
+        </a>
         <ProfileMenu user={user} />
       </div>
     </header>

@@ -7,7 +7,7 @@ const navItems = [
   { icon: "dashboard", label: "Dasbor", href: "/dashboard" },
   { icon: "receipt_long", label: "Transaksi", href: "/transaksi" },
   { icon: "savings", label: "Tujuan Tabungan", href: "/tabungan" },
-  { icon: "account_balance_wallet", label: "Anggaran", href: "#" },
+  { icon: "account_balance_wallet", label: "Anggaran", href: "/anggaran" },
 ];
 
 export default function Sidebar() {
@@ -55,7 +55,7 @@ export default function Sidebar() {
         <ul className="space-y-1">
           <li>
             <a
-              href="#"
+              href="/pengaturan"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-high hover:text-primary"
             >
               <Icon icon="settings" />
@@ -64,7 +64,7 @@ export default function Sidebar() {
           </li>
           <li>
             <a
-              href="#"
+              href="/dukungan"
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-on-surface-variant transition-colors duration-200 hover:bg-surface-container-high hover:text-primary"
             >
               <Icon icon="help" />

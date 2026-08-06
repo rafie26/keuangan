@@ -10,22 +10,25 @@ export interface Transaction {
   created_at: string;
 }
 
-export const categories = [
-  { name: "Pendapatan", icon: "work" },
-  { name: "Makanan", icon: "restaurant" },
-  { name: "Belanjaan", icon: "shopping_cart" },
-  { name: "Perumahan", icon: "home" },
-  { name: "Utilitas", icon: "bolt" },
-  { name: "Transportasi", icon: "directions_car" },
-  { name: "Hiburan", icon: "movie" },
-  { name: "Kesehatan", icon: "medical_services" },
-  { name: "Pendidikan", icon: "school" },
-  { name: "Lainnya", icon: "more_horiz" },
+export const categoryIconOptions = [
+  "work",
+  "payments",
+  "restaurant",
+  "shopping_cart",
+  "home",
+  "bolt",
+  "directions_car",
+  "movie",
+  "medical_services",
+  "school",
+  "fitness_center",
+  "pets",
+  "sports_esports",
+  "redeem",
+  "local_cafe",
+  "phone_iphone",
+  "more_horiz",
 ];
-
-export function iconForCategory(category: string): string {
-  return categories.find((c) => c.name === category)?.icon ?? "more_horiz";
-}
 
 export function formatRupiah(value: number): string {
   return "Rp " + new Intl.NumberFormat("id-ID").format(value);
