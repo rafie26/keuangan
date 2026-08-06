@@ -1,19 +1,31 @@
 import Icon from "./Icon";
+import { formatRupiah } from "@/lib/transactions";
 
-export default function BalanceCards() {
+export default function BalanceCards({
+  totalBalance,
+  monthlyIncome,
+  monthlyExpense,
+}: {
+  totalBalance: number;
+  monthlyIncome: number;
+  monthlyExpense: number;
+}) {
   return (
     <div className="mb-unit-lg grid grid-cols-1 gap-gutter md:grid-cols-3">
-      <div className="col-span-1 rounded-xl bg-surface-container-lowest p-unit-lg card-shadow md:col-span-1">
+      <div className="rounded-xl bg-surface-container-lowest p-unit-lg card-shadow md:col-span-1">
         <p className="mb-2 text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">
           Total Saldo
         </p>
-        <h2 className="mb-4 text-number-xl font-number-xl font-tabular text-on-surface">
-          Rp 1.929.750.000
+        <h2
+          className={`mb-4 text-number-xl font-number-xl font-tabular ${
+            totalBalance < 0 ? "text-error" : "text-on-surface"
+          }`}
+        >
+          {formatRupiah(totalBalance)}
         </h2>
-        <div className="flex items-center gap-1 text-secondary">
-          <Icon icon="trending_up" className="text-sm" />
-          <span className="text-label-sm font-label-sm">+2.4% bulan ini</span>
-        </div>
+        <p className="text-label-sm font-label-sm text-on-surface-variant">
+          Pemasukan dikurangi pengeluaran
+        </p>
       </div>
       <div className="col-span-1 grid grid-cols-2 gap-gutter md:col-span-2">
         <div className="rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
@@ -27,7 +39,7 @@ export default function BalanceCards() {
             />
           </div>
           <h3 className="text-headline-lg font-headline-lg font-tabular text-on-surface">
-            Rp 127.875.000
+            {formatRupiah(monthlyIncome)}
           </h3>
         </div>
         <div className="rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
@@ -41,7 +53,7 @@ export default function BalanceCards() {
             />
           </div>
           <h3 className="text-headline-lg font-headline-lg font-tabular text-on-surface">
-            Rp 48.367.750
+            {formatRupiah(monthlyExpense)}
           </h3>
         </div>
       </div>

@@ -1,42 +1,79 @@
-const bars = [
-  { label: "Jan", height: "h-1/3", color: "bg-primary", value: "Rp 31Jt" },
-  { label: "Feb", height: "h-2/3", color: "bg-secondary", value: "Rp 77Jt" },
-  { label: "Mar", height: "h-1/2", color: "bg-primary", value: "Rp 46Jt" },
-  { label: "Apr", height: "h-3/4", color: "bg-secondary", value: "Rp 93Jt" },
-  { label: "Mei", height: "h-1/4", color: "bg-primary", value: "Rp 23Jt" },
-  { label: "Jun", height: "h-5/6", color: "bg-secondary", value: "Rp 108Jt" },
-  { label: "Jul", height: "h-2/5", color: "bg-primary", value: "Rp 38Jt" },
-];
+import { formatRupiah } from "@/lib/transactions";
 
-export default function CashflowChart() {
+export interface CashflowPoint {
+  label: string;
+  income: number;
+  expense: number;
+}
+
+export default function CashflowChart({ data }: { data: CashflowPoint[] }) {
+  const max = Math.max(1, ...data.flatMap((d) => [d.income, d.expense]));
+  const hasData = data.some((d) => d.income > 0 || d.expense > 0);
+
   return (
     <div className="flex h-[400px] flex-col rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-headline-sm font-headline-sm text-on-surface">
           Arus Kas
         </h3>
-        <select className="rounded-md border border-outline-variant bg-surface-container px-2 py-1 text-body-sm text-on-surface-variant">
-          <option>Tahun Ini</option>
-          <option>Tahun Lalu</option>
-        </select>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5 text-label-sm font-label-sm text-on-surface-variant">
+            <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
+            Pemasukan
+          </span>
+          <span className="flex items-center gap-1.5 text-label-sm font-label-sm text-on-surface-variant">
+            <span className="h-2.5 w-2.5 rounded-full bg-error" />
+            Pengeluaran
+          </span>
+        </div>
       </div>
-      <div className="relative flex flex-1 items-end justify-between border-b border-l border-outline-variant/30 px-4 pb-2 pt-8">
-        {bars.map((bar) => (
-          <div
-            key={bar.label}
-            className={`group relative w-8 rounded-t-sm ${bar.color} ${bar.height}`}
-          >
-            <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded bg-inverse-surface px-2 py-1 text-xs text-inverse-on-surface group-hover:block">
-              {bar.value}
-            </div>
+
+      {hasData ? (
+        <>
+          <div className="flex flex-1 items-end justify-between gap-2 border-b border-l border-outline-variant/30 px-4 pb-2 pt-8">
+            {data.map((d) => {
+              const incomeH = Math.round((d.income / max) * 100);
+              const expenseH = Math.round((d.expense / max) * 100);
+              return (
+                <div
+                  key={d.label}
+                  className="flex h-full flex-1 items-end justify-center gap-1.5"
+                >
+                  <div
+                    className="relative flex h-full w-3 items-end"
+                    title={`Pemasukan: ${formatRupiah(d.income)}`}
+                  >
+                    <div
+                      className="w-full rounded-t-sm bg-secondary transition-all"
+                      style={{ height: `${incomeH}%` }}
+                    />
+                  </div>
+                  <div
+                    className="relative flex h-full w-3 items-end"
+                    title={`Pengeluaran: ${formatRupiah(d.expense)}`}
+                  >
+                    <div
+                      className="w-full rounded-t-sm bg-error transition-all"
+                      style={{ height: `${expenseH}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ))}
-      </div>
-      <div className="mt-2 flex justify-between px-4 text-label-sm text-on-surface-variant">
-        {bars.map((bar) => (
-          <span key={bar.label}>{bar.label}</span>
-        ))}
-      </div>
+          <div className="mt-2 flex justify-between px-4 text-label-sm text-on-surface-variant">
+            {data.map((d) => (
+              <span key={d.label}>{d.label}</span>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
+          <p className="text-body-sm font-body-sm text-on-surface-variant">
+            Belum ada data transaksi.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,64 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
+  const [{ data: txData }, { data: goalsData }] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500),
+    supabase
+      .from("savings_goals")
+      .select("*")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const transactions = txData ?? [];
+  const goals = goalsData ?? [];
+
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisMonth = now.getMonth();
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+  let monthlyIncome = 0;
+  let monthlyExpense = 0;
+
+  const chart = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(thisYear, thisMonth - (11 - i), 1);
+    return {
+      key: `${d.getFullYear()}-${d.getMonth()}`,
+      label: new Intl.DateTimeFormat("id-ID", { month: "short" }).format(d),
+      income: 0,
+      expense: 0,
+    };
+  });
+  const chartByKey = new Map(chart.map((c) => [c.key, c]));
+
+  for (const t of transactions) {
+    const amount = Number(t.amount);
+    const d = new Date(t.created_at);
+    const isThisMonth =
+      d.getFullYear() === thisYear && d.getMonth() === thisMonth;
+
+    if (t.type === "income") {
+      totalIncome += amount;
+      if (isThisMonth) monthlyIncome += amount;
+    } else {
+      totalExpense += amount;
+      if (isThisMonth) monthlyExpense += amount;
+    }
+
+    const cell = chartByKey.get(`${d.getFullYear()}-${d.getMonth()}`);
+    if (cell) {
+      if (t.type === "income") cell.income += amount;
+      else cell.expense += amount;
+    }
+  }
+
+  const totalBalance = totalIncome - totalExpense;
+
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
@@ -39,15 +97,25 @@ export default async function Dashboard() {
                 Dasbor
               </h1>
             </div>
-            <BalanceCards />
+            <BalanceCards
+              totalBalance={totalBalance}
+              monthlyIncome={monthlyIncome}
+              monthlyExpense={monthlyExpense}
+            />
             <div className="grid grid-cols-1 gap-gutter lg:grid-cols-3">
               <div className="space-y-gutter lg:col-span-2">
-                <CashflowChart />
+                <CashflowChart
+                  data={chart.map(({ label, income, expense }) => ({
+                    label,
+                    income,
+                    expense,
+                  }))}
+                />
                 <QuickActions />
               </div>
               <div className="space-y-gutter">
-                <RecentTransactions />
-                <SavingsWidget />
+                <RecentTransactions transactions={transactions} />
+                <SavingsWidget goals={goals} />
               </div>
             </div>
           </div>
