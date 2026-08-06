@@ -6,7 +6,7 @@ import Icon from "./Icon";
 const navItems = [
   { icon: "dashboard", label: "Dasbor", href: "/dashboard" },
   { icon: "receipt_long", label: "Transaksi", href: "/transaksi" },
-  { icon: "savings", label: "Tujuan Tabungan", href: "#" },
+  { icon: "savings", label: "Tujuan Tabungan", href: "/tabungan" },
   { icon: "account_balance_wallet", label: "Anggaran", href: "#" },
 ];
 
