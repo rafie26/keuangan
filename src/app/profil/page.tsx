@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import Icon from "@/components/Icon";
+import AvatarUploader from "@/components/AvatarUploader";
 import { formatRupiah } from "@/lib/transactions";
 
 export default async function ProfilePage() {
@@ -57,27 +57,19 @@ export default async function ProfilePage() {
               </h1>
             </div>
 
-            <div className="mb-unit-lg rounded-xl bg-surface-container-lowest p-unit-lg text-center card-shadow">
-              {avatarUrl ? (
-                <Image
-                  className="mx-auto h-24 w-24 rounded-full object-cover"
-                  src={avatarUrl}
-                  alt="Foto profil"
-                  width={96}
-                  height={96}
-                />
-              ) : (
-                <span className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Icon icon="person" className="text-4xl" />
-                </span>
-              )}
-              <h2 className="mt-4 text-headline-md font-headline-md text-on-surface">
+            <div className="mb-unit-lg rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
+              <AvatarUploader
+                userId={user.id}
+                avatarUrl={avatarUrl}
+                name={name}
+              />
+              <h2 className="mt-4 text-center text-headline-md font-headline-md text-on-surface">
                 {name}
               </h2>
-              <p className="text-body-sm font-body-sm text-on-surface-variant">
+              <p className="text-center text-body-sm font-body-sm text-on-surface-variant">
                 {email}
               </p>
-              <p className="mt-1 text-label-sm font-label-sm text-on-surface-variant">
+              <p className="mt-1 text-center text-label-sm font-label-sm text-on-surface-variant">
                 Bergabung sejak {memberSince}
               </p>
             </div>

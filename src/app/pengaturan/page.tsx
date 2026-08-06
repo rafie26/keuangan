@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
-import Icon from "@/components/Icon";
 import AccountForm from "@/components/AccountForm";
+import AvatarUploader from "@/components/AvatarUploader";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -48,24 +47,12 @@ export default async function SettingsPage() {
                 <h3 className="mb-unit-md text-headline-sm font-headline-sm text-on-surface">
                   Akun
                 </h3>
-                <div className="mb-unit-md flex items-center gap-4">
-                  {avatarUrl ? (
-                    <Image
-                      className="h-16 w-16 rounded-full object-cover"
-                      src={avatarUrl}
-                      alt="Foto profil"
-                      width={64}
-                      height={64}
-                    />
-                  ) : (
-                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <Icon icon="person" className="text-2xl" />
-                    </span>
-                  )}
-                  <p className="text-label-sm font-label-sm text-on-surface-variant">
-                    Terhubung dengan akun Google Anda. Data tersimpan aman per
-                    akun.
-                  </p>
+                <div className="mb-unit-md border-b border-outline-variant/30 pb-unit-md">
+                  <AvatarUploader
+                    userId={user.id}
+                    avatarUrl={avatarUrl}
+                    name={name}
+                  />
                 </div>
                 <AccountForm email={email} initialName={name} />
               </div>
