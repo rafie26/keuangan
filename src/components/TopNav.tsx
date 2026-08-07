@@ -1,13 +1,29 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
 import Icon from "./Icon";
 import ProfileMenu, { type ProfileUser } from "./ProfileMenu";
+import {
+  getMobileMenuState,
+  subscribeMobileMenu,
+  toggleMobileMenu,
+} from "@/lib/mobile-menu";
 
 export default function TopNav({ user }: { user: ProfileUser }) {
+  const open = useSyncExternalStore(
+    subscribeMobileMenu,
+    getMobileMenuState
+  );
+
   return (
     <header className="fixed right-0 top-0 z-40 flex h-16 w-full items-center justify-between border-b border-outline-variant/30 bg-surface/80 px-margin-mobile backdrop-blur-md md:w-[calc(100%-16rem)] md:px-margin-desktop">
       <div className="flex flex-1 items-center">
         <button
+          onClick={toggleMobileMenu}
           className="mr-4 text-on-surface-variant md:hidden"
-          aria-label="Menu"
+          aria-label="Buka menu"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           <Icon icon="menu" />
         </button>
