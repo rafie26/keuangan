@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import TransactionForm from "@/components/TransactionForm";
 import TransactionList from "@/components/TransactionList";
+import CategoryManager from "@/components/CategoryManager";
 import { formatRupiah } from "@/lib/transactions";
 import { getAvatarUrl } from "@/lib/user";
 
@@ -83,8 +84,9 @@ export default async function TransactionsPage() {
               <div className="lg:col-span-2">
                 <TransactionList transactions={transactions} />
               </div>
-              <div>
+              <div className="space-y-gutter">
                 <TransactionForm categories={categories} />
+                <CategoryManager categories={categories} />
               </div>
             </div>
           </div>

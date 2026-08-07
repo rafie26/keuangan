@@ -15,6 +15,13 @@ export default async function NotificationsPage() {
     redirect("/login");
   }
 
+  const { data: notificationsData } = await supabase
+    .from("notifications")
+    .select("id, icon, title, body, is_read, created_at")
+    .order("created_at", { ascending: false });
+
+  const notifications = notificationsData ?? [];
+
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
@@ -36,7 +43,7 @@ export default async function NotificationsPage() {
                 Notifikasi
               </h1>
             </div>
-            <NotificationList />
+            <NotificationList notifications={notifications} />
           </div>
         </main>
       </div>
