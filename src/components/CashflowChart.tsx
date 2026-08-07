@@ -11,7 +11,7 @@ export default function CashflowChart({ data }: { data: CashflowPoint[] }) {
   const hasData = data.some((d) => d.income > 0 || d.expense > 0);
 
   return (
-    <div className="flex h-[400px] flex-col rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">
+    <div className="flex h-[360px] flex-col rounded-xl bg-surface-container-lowest p-unit-lg card-shadow sm:h-[400px]">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-headline-sm font-headline-sm text-on-surface">
           Arus Kas
@@ -29,18 +29,18 @@ export default function CashflowChart({ data }: { data: CashflowPoint[] }) {
       </div>
 
       {hasData ? (
-        <>
-          <div className="flex flex-1 items-end justify-between gap-2 border-b border-l border-outline-variant/30 px-4 pb-2 pt-8">
+        <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
+          <div className="flex flex-1 items-end justify-between gap-1.5 border-b border-l border-outline-variant/30 px-3 pb-2 pt-8 sm:gap-2 sm:px-4 min-w-[560px] sm:min-w-0">
             {data.map((d) => {
               const incomeH = Math.round((d.income / max) * 100);
               const expenseH = Math.round((d.expense / max) * 100);
               return (
                 <div
                   key={d.label}
-                  className="flex h-full flex-1 items-end justify-center gap-1.5"
+                  className="flex h-full flex-1 items-end justify-center gap-1 sm:gap-1.5"
                 >
                   <div
-                    className="relative flex h-full w-3 items-end"
+                    className="relative flex h-full w-2 items-end sm:w-3"
                     title={`Pemasukan: ${formatRupiah(d.income)}`}
                   >
                     <div
@@ -49,7 +49,7 @@ export default function CashflowChart({ data }: { data: CashflowPoint[] }) {
                     />
                   </div>
                   <div
-                    className="relative flex h-full w-3 items-end"
+                    className="relative flex h-full w-2 items-end sm:w-3"
                     title={`Pengeluaran: ${formatRupiah(d.expense)}`}
                   >
                     <div
@@ -61,12 +61,12 @@ export default function CashflowChart({ data }: { data: CashflowPoint[] }) {
               );
             })}
           </div>
-          <div className="mt-2 flex justify-between px-4 text-label-sm text-on-surface-variant">
+          <div className="mt-2 flex min-w-[560px] justify-between gap-1.5 px-3 text-label-sm text-on-surface-variant sm:min-w-0 sm:gap-2 sm:px-4">
             {data.map((d) => (
               <span key={d.label}>{d.label}</span>
             ))}
           </div>
-        </>
+        </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
           <p className="text-body-sm font-body-sm text-on-surface-variant">
