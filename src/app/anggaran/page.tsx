@@ -5,6 +5,7 @@ import TopNav from "@/components/TopNav";
 import BudgetList from "@/components/BudgetList";
 import BudgetForm from "@/components/BudgetForm";
 import { formatRupiah } from "@/lib/transactions";
+import { getAvatarUrl } from "@/lib/user";
 
 export default async function BudgetPage() {
   const supabase = await createClient();
@@ -66,7 +67,7 @@ export default async function BudgetPage() {
               user.user_metadata?.full_name ??
               user.user_metadata?.name ??
               undefined,
-            avatarUrl: user.user_metadata?.avatar_url ?? undefined,
+            avatarUrl: getAvatarUrl(user.user_metadata),
           }}
         />
         <main className="flex-1 overflow-y-auto px-margin-mobile pb-unit-xl pt-24 md:px-margin-desktop">

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import Icon from "@/components/Icon";
+import { getAvatarUrl } from "@/lib/user";
 
 const faqs = [
   {
@@ -48,7 +49,7 @@ export default async function SupportPage() {
               user.user_metadata?.full_name ??
               user.user_metadata?.name ??
               undefined,
-            avatarUrl: user.user_metadata?.avatar_url ?? undefined,
+            avatarUrl: getAvatarUrl(user.user_metadata),
           }}
         />
         <main className="flex-1 overflow-y-auto px-margin-mobile pb-unit-xl pt-24 md:px-margin-desktop">

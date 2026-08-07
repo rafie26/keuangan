@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import AccountForm from "@/components/AccountForm";
 import AvatarUploader from "@/components/AvatarUploader";
+import { getAvatarUrl } from "@/lib/user";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -21,7 +22,7 @@ export default async function SettingsPage() {
     user.user_metadata?.name ??
     email ??
     "Pengguna";
-  const avatarUrl = user.user_metadata?.avatar_url ?? "";
+  const avatarUrl = getAvatarUrl(user.user_metadata) ?? "";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">

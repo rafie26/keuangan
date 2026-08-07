@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import Icon from "@/components/Icon";
 import AvatarUploader from "@/components/AvatarUploader";
+import { getAvatarUrl } from "@/lib/user";
 import { formatRupiah } from "@/lib/transactions";
 
 export default async function ProfilePage() {
@@ -22,7 +23,7 @@ export default async function ProfilePage() {
     user.user_metadata?.name ??
     email ??
     "Pengguna";
-  const avatarUrl = user.user_metadata?.avatar_url ?? "";
+  const avatarUrl = getAvatarUrl(user.user_metadata) ?? "";
   const memberSince = new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "long",
