@@ -144,8 +144,7 @@ export default function AIChat() {
           </h2>
           <p className="text-label-sm font-label-sm text-on-surface-variant">
             Bisa melihat saldo & transaksi Anda untuk memberi saran (read-only)
-          </p>
-        </div>
+          </p>        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-unit-lg py-unit-md">
@@ -159,7 +158,7 @@ export default function AIChat() {
                 Tanya penasihat keuangan Anda
               </h3>
               <p className="mx-auto max-w-sm text-body-sm font-body-sm text-on-surface-variant">
-                Grok membaca saldo, pengeluaran bulan ini, anggaran, dan tujuan
+                AI membaca saldo, pengeluaran bulan ini, anggaran, dan tujuan
                 tabungan Anda untuk memberi rekomendasi hemat yang realistis.
               </p>
             </div>
@@ -200,7 +199,7 @@ export default function AIChat() {
             <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-4 py-3">
               <Icon icon="auto_awesome" className="animate-pulse text-primary" />
               <span className="text-label-sm font-label-sm text-on-surface-variant">
-                Grok sedang menulis...
+                AI sedang menulis...
               </span>
             </div>
           </div>

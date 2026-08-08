@@ -13,13 +13,28 @@ export async function POST(request: Request) {
     return Response.json({ error: "Tidak terautentikasi." }, { status: 401 });
   }
 
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) {
+  const groqKey = process.env.GROQ_API_KEY;
+  const xaiKey = process.env.XAI_API_KEY;
+
+  if (!groqKey && !xaiKey) {
     return Response.json(
-      { error: "XAI_API_KEY belum dikonfigurasi di server." },
+      { error: "GROQ_API_KEY atau XAI_API_KEY belum dikonfigurasi di server." },
       { status: 500 }
     );
   }
+
+  // Groq dipakai lebih dulu karena punya free tier; fallback ke xAI.
+  const provider = groqKey
+    ? {
+        baseUrl: "https://api.groq.com/openai/v1",
+        apiKey: groqKey,
+        model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      }
+    : {
+        baseUrl: "https://api.x.ai/v1",
+        apiKey: xaiKey!,
+        model: process.env.XAI_MODEL || "grok-4.5",
+      };
 
   let messages: { role: string; content: string }[] = [];
   try {
@@ -34,7 +49,7 @@ export async function POST(request: Request) {
 
   const context = await buildFinancialContext(supabase);
 
-  const systemPrompt = `Kamu adalah penasihat keuangan pribadi bernama Grok yang ramah, membantu, dan praktis untuk aplikasi "Keuangan" di Indonesia.
+  const systemPrompt = `Kamu adalah penasihat keuangan pribadi yang ramah, membantu, dan praktis untuk aplikasi "Keuangan" di Indonesia.
 
 Kamu MENERIMA data keuangan user di bawah ini dan harus menggunakannya untuk menjawab pertanyaan.
 
@@ -49,29 +64,34 @@ ATURAN:
 DATA KEUANGAN USER SAAT INI (bulan ${new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date())}):
 ${JSON.stringify(context, null, 2)}`;
 
-  const xaiMessages = [
+  const chatMessages = [
     { role: "system", content: systemPrompt },
     ...messages.map((m) => ({ role: m.role, content: m.content })),
   ];
 
-  const upstream = await fetch("https://api.x.ai/v1/chat/completions", {
+  const upstream = await fetch(`${provider.baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: process.env.XAI_MODEL || "grok-4.5",
+      model: provider.model,
       stream: true,
-      messages: xaiMessages,
+      messages: chatMessages,
     }),
   });
 
   if (!upstream.ok) {
     const detail = await upstream.text().catch(() => "");
-    console.error("Grok API error:", upstream.status, detail.slice(0, 500));
+    console.error(
+      "AI provider error:",
+      provider.baseUrl,
+      upstream.status,
+      detail.slice(0, 500)
+    );
     return Response.json(
-      { error: `Grok API error ${upstream.status}.` },
+      { error: `AI API error ${upstream.status}.` },
       { status: 502 }
     );
   }

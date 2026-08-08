@@ -36,7 +36,7 @@ export default async function AIPage() {
                 Penasihat AI
               </h1>
               <p className="mt-1 text-body-sm font-body-sm text-on-surface-variant">
-                Tanya Grok tentang cara menghemat pengeluaran bulan ini sesuai
+                Tanya AI tentang cara menghemat pengeluaran bulan ini sesuai
                 saldo Anda.
               </p>
             </div>
