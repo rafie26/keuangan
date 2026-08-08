@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BalanceCards from "@/components/BalanceCards";
 import CashflowChart from "@/components/CashflowChart";
+import DailySpendingBanner from "@/components/DailySpendingBanner";
 import QuickActions from "@/components/QuickActions";
 import RecentTransactions from "@/components/RecentTransactions";
 import SavingsWidget from "@/components/SavingsWidget";
@@ -19,20 +20,23 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const [{ data: txData }, { data: goalsData }] = await Promise.all([
-    supabase
-      .from("transactions")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(500),
-    supabase
-      .from("savings_goals")
-      .select("*")
-      .order("created_at", { ascending: false }),
-  ]);
+  const [{ data: txData }, { data: goalsData }, { data: budgetsData }] =
+    await Promise.all([
+      supabase
+        .from("transactions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500),
+      supabase
+        .from("savings_goals")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      supabase.from("budgets").select("*"),
+    ]);
 
   const transactions = txData ?? [];
   const goals = goalsData ?? [];
+  const budgets = budgetsData ?? [];
 
   const now = new Date();
   const thisYear = now.getFullYear();
@@ -77,6 +81,20 @@ export default async function Dashboard() {
 
   const totalBalance = totalIncome - totalExpense;
 
+  const daysInMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
+  const totalBudget = budgets.reduce(
+    (sum, b) => sum + Number(b.limit_amount),
+    0
+  );
+  const dailyLimit = totalBudget > 0 ? totalBudget / daysInMonth : 0;
+
+  const startOfToday = new Date(thisYear, thisMonth, now.getDate());
+  let todaySpent = 0;
+  for (const t of transactions) {
+    if (t.type !== "expense") continue;
+    if (new Date(t.created_at) >= startOfToday) todaySpent += Number(t.amount);
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
@@ -98,6 +116,10 @@ export default async function Dashboard() {
                 Dasbor
               </h1>
             </div>
+            <DailySpendingBanner
+              todaySpent={todaySpent}
+              dailyLimit={dailyLimit}
+            />
             <BalanceCards
               totalBalance={totalBalance}
               monthlyIncome={monthlyIncome}

@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import Icon from "./Icon";
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  updated_at: string;
 }
 
 const suggestionPrompts = [
@@ -15,6 +23,8 @@ const suggestionPrompts = [
 ];
 
 export default function AIChat() {
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,6 +32,27 @@ export default function AIChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const assistantTextRef = useRef("");
+
+  useEffect(() => {
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("chat_sessions")
+      .select("id, title, messages, updated_at")
+      .order("updated_at", { ascending: false })
+      .then(({ data }) => {
+        if (cancelled) return;
+        const list = (data ?? []) as ChatSession[];
+        setSessions(list);
+        if (list.length > 0) {
+          setActiveId(list[0].id);
+          setMessages(list[0].messages ?? []);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -33,6 +64,37 @@ export default function AIChat() {
   useEffect(() => {
     return () => abortRef.current?.abort();
   }, []);
+
+  function newChat() {
+    abortRef.current?.abort();
+    setActiveId(null);
+    setMessages([]);
+    setError(null);
+  }
+
+  function selectSession(session: ChatSession) {
+    abortRef.current?.abort();
+    setActiveId(session.id);
+    setMessages(session.messages ?? []);
+    setError(null);
+  }
+
+  async function deleteSession(id: string) {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("chat_sessions")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+    if (activeId === id) {
+      setActiveId(null);
+      setMessages([]);
+    }
+  }
 
   async function sendMessage(text: string) {
     const content = text.trim();
@@ -47,6 +109,26 @@ export default function AIChat() {
     setError(null);
     setLoading(true);
 
+    const supabase = createClient();
+    let sessionId = activeId;
+
+    if (!sessionId) {
+      const title = nextMessages[0].content.slice(0, 40);
+      const { data, error: insertError } = await supabase
+        .from("chat_sessions")
+        .insert({ title, messages: nextMessages })
+        .select("id, title, messages, updated_at")
+        .single();
+      if (insertError || !data) {
+        setError(insertError?.message ?? "Gagal membuat percakapan.");
+        setLoading(false);
+        return;
+      }
+      sessionId = data.id;
+      setActiveId(sessionId);
+      setSessions((prev) => [data as ChatSession, ...prev]);
+    }
+
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -55,7 +137,10 @@ export default function AIChat() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: nextMessages.map((m) => ({ role: m.role, content: m.content })),
+          messages: nextMessages.map((m) => ({
+            role: m.role,
+            content: m.content,
+          })),
         }),
         signal: controller.signal,
       });
@@ -117,6 +202,31 @@ export default function AIChat() {
           }
         }
       }
+
+      const finalMessages: ChatMessage[] = [
+        ...nextMessages,
+        { role: "assistant", content: assistantTextRef.current },
+      ];
+      const now = new Date().toISOString();
+      const { error: updateError } = await supabase
+        .from("chat_sessions")
+        .update({ messages: finalMessages, updated_at: now })
+        .eq("id", sessionId!);
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+      setSessions((prev) => {
+        const rest = prev.filter((s) => s.id !== sessionId);
+        const existing = prev.find((s) => s.id === sessionId);
+        const updated: ChatSession = {
+          id: sessionId!,
+          title: existing?.title ?? nextMessages[0].content.slice(0, 40),
+          messages: finalMessages,
+          updated_at: now,
+        };
+        return [updated, ...rest];
+      });
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
         setError((err as Error).message);
@@ -133,18 +243,61 @@ export default function AIChat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-14rem)] flex-col rounded-xl bg-surface-container-lowest card-shadow md:h-[calc(100vh-16rem)]">
+    <div className="flex h-[calc(100vh-16rem)] flex-col rounded-xl bg-surface-container-lowest card-shadow md:h-[calc(100vh-18rem)]">
       <div className="flex items-center gap-3 border-b border-outline-variant/30 px-unit-lg py-unit-md">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/20 text-primary">
           <Icon icon="auto_awesome" />
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h2 className="text-headline-sm font-headline-sm text-on-surface">
             Penasihat AI
           </h2>
-          <p className="text-label-sm font-label-sm text-on-surface-variant">
+          <p className="truncate text-label-sm font-label-sm text-on-surface-variant">
             Bisa melihat saldo & transaksi Anda untuk memberi saran (read-only)
-          </p>        </div>
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 overflow-x-auto border-b border-outline-variant/30 px-unit-lg py-unit-sm">
+        <button
+          type="button"
+          onClick={newChat}
+          className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-label-sm font-label-sm transition-colors ${
+            activeId === null
+              ? "border-primary bg-primary-container/15 text-primary"
+              : "border-outline-variant bg-surface-container-low text-on-surface-variant hover:border-primary hover:text-primary"
+          }`}
+        >
+          <Icon icon="add" className="text-sm" />
+          Percakapan baru
+        </button>
+        {sessions.map((s) => (
+          <div
+            key={s.id}
+            className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 transition-colors ${
+              activeId === s.id
+                ? "border-primary bg-primary-container/15 text-primary"
+                : "border-outline-variant bg-surface-container-low text-on-surface-variant hover:border-primary hover:text-primary"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => selectSession(s)}
+              className="max-w-[10rem] truncate text-label-sm font-label-sm"
+              title={s.title}
+            >
+              {s.title}
+            </button>
+            <button
+              type="button"
+              onClick={() => deleteSession(s.id)}
+              className="rounded-full p-0.5 hover:bg-surface-container-high"
+              aria-label={`Hapus ${s.title}`}
+            >
+              <Icon icon="close" className="text-sm" />
+            </button>
+          </div>
+        ))}
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-unit-lg py-unit-md">
