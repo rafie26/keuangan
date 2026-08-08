@@ -4,8 +4,14 @@ import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import BudgetList from "@/components/BudgetList";
 import BudgetForm from "@/components/BudgetForm";
+import DailySpendingBanner from "@/components/DailySpendingBanner";
 import { formatRupiah } from "@/lib/transactions";
 import { getAvatarUrl } from "@/lib/user";
+import {
+  DEFAULT_TIMEZONE,
+  remainingDaysTz,
+  startOfDayInTz,
+} from "@/lib/timezone";
 
 export default async function BudgetPage() {
   const supabase = await createClient();
@@ -56,6 +62,35 @@ export default async function BudgetPage() {
     0
   );
 
+  const timeZone =
+    (typeof user.user_metadata?.timezone === "string" &&
+      user.user_metadata.timezone) ||
+    DEFAULT_TIMEZONE;
+
+  const now = new Date();
+  const remainingDays = remainingDaysTz(now, timeZone);
+  const startOfToday = startOfDayInTz(now, timeZone);
+
+  const { data: allTxData } = await supabase
+    .from("transactions")
+    .select("type, amount, created_at")
+    .limit(1000);
+
+  let totalIncome = 0;
+  let totalExpense = 0;
+  let todaySpent = 0;
+  for (const t of allTxData ?? []) {
+    const amount = Number(t.amount);
+    if (t.type === "income") totalIncome += amount;
+    else {
+      totalExpense += amount;
+      if (new Date(t.created_at) >= startOfToday) todaySpent += amount;
+    }
+  }
+  const remainingBalance = totalIncome - totalExpense;
+  const dailyLimit =
+    remainingDays > 0 ? remainingBalance / remainingDays : 0;
+
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
@@ -77,6 +112,13 @@ export default async function BudgetPage() {
                 Anggaran
               </h1>
             </div>
+
+            <DailySpendingBanner
+              todaySpent={todaySpent}
+              remainingBalance={remainingBalance}
+              remainingDays={remainingDays}
+              dailyLimit={dailyLimit}
+            />
 
             <div className="mb-unit-lg grid grid-cols-1 gap-gutter md:grid-cols-3">
               <div className="rounded-xl bg-surface-container-lowest p-unit-lg card-shadow">

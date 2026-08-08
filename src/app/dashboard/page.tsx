@@ -2,18 +2,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BalanceCards from "@/components/BalanceCards";
 import CashflowChart from "@/components/CashflowChart";
-import DailySpendingBanner from "@/components/DailySpendingBanner";
 import QuickActions from "@/components/QuickActions";
 import RecentTransactions from "@/components/RecentTransactions";
 import SavingsWidget from "@/components/SavingsWidget";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import { getAvatarUrl } from "@/lib/user";
-import {
-  DEFAULT_TIMEZONE,
-  remainingDaysTz,
-  startOfDayInTz,
-} from "@/lib/timezone";
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -83,22 +77,6 @@ export default async function Dashboard() {
 
   const totalBalance = totalIncome - totalExpense;
 
-  const timeZone =
-    (typeof user.user_metadata?.timezone === "string" &&
-      user.user_metadata.timezone) ||
-    DEFAULT_TIMEZONE;
-
-  const remainingDays = remainingDaysTz(now, timeZone);
-  const startOfToday = startOfDayInTz(now, timeZone);
-
-  let todaySpent = 0;
-  for (const t of transactions) {
-    if (t.type !== "expense") continue;
-    if (new Date(t.created_at) >= startOfToday) todaySpent += Number(t.amount);
-  }
-
-  const dailyLimit = remainingDays > 0 ? totalBalance / remainingDays : 0;
-
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
       <Sidebar />
@@ -120,13 +98,6 @@ export default async function Dashboard() {
                 Dasbor
               </h1>
             </div>
-            <DailySpendingBanner
-              todaySpent={todaySpent}
-              remainingBalance={totalBalance}
-              remainingDays={remainingDays}
-              dailyLimit={dailyLimit}
-              timezone={timeZone}
-            />
             <BalanceCards
               totalBalance={totalBalance}
               monthlyIncome={monthlyIncome}
