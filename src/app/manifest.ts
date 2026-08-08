@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Keuangan",
     description:
       "Smart Finance & Savings Tracker - pantau saldo, anggaran, dan tabungan Anda.",
-    start_url: "/",
+    start_url: "/dashboard",
     scope: "/",
     display: "standalone",
     orientation: "portrait",

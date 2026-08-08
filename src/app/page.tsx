@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import Icon from "@/components/Icon";
 import HeroBalance from "@/components/landing/HeroBalance";
+import { createClient } from "@/lib/supabase/server";
 
 const bars = [
   { label: "Jan", value: "31", delay: "0ms" },
@@ -53,7 +55,16 @@ const steps = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <>
       <main className="flex flex-1 flex-col bg-background text-on-background antialiased">
