@@ -15,6 +15,7 @@ const navItems = [
   { icon: "receipt_long", label: "Transaksi", href: "/transaksi" },
   { icon: "savings", label: "Tujuan Tabungan", href: "/tabungan" },
   { icon: "account_balance_wallet", label: "Anggaran", href: "/anggaran" },
+  { icon: "auto_awesome", label: "Penasihat AI", href: "/ai" },
 ];
 
 function SidebarContent() {
