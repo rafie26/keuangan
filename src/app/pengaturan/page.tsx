@@ -4,7 +4,9 @@ import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import AccountForm from "@/components/AccountForm";
 import AvatarUploader from "@/components/AvatarUploader";
+import TimezoneForm from "@/components/TimezoneForm";
 import { getAvatarUrl } from "@/lib/user";
+import { DEFAULT_TIMEZONE } from "@/lib/timezone";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -23,6 +25,10 @@ export default async function SettingsPage() {
     email ??
     "Pengguna";
   const avatarUrl = getAvatarUrl(user.user_metadata) ?? "";
+  const timezone =
+    (typeof user.user_metadata?.timezone === "string" &&
+      user.user_metadata.timezone) ||
+    DEFAULT_TIMEZONE;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
@@ -63,20 +69,7 @@ export default async function SettingsPage() {
                   Preferensi
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-body-sm font-body-sm font-medium text-on-surface">
-                        Bahasa
-                      </p>
-                      <p className="text-label-sm font-label-sm text-on-surface-variant">
-                        Bahasa antarmuka aplikasi
-                      </p>
-                    </div>
-                    <select className="rounded-lg border border-outline-variant bg-surface-container-low px-3 py-2 text-body-sm font-body-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
-                      <option>Bahasa Indonesia</option>
-                      <option>English</option>
-                    </select>
-                  </div>
+                  <TimezoneForm current={timezone} />
                   <div className="flex items-center justify-between border-t border-outline-variant/30 pt-4">
                     <div>
                       <p className="text-body-sm font-body-sm font-medium text-on-surface">

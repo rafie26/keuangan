@@ -9,6 +9,11 @@ import SavingsWidget from "@/components/SavingsWidget";
 import Sidebar from "@/components/Sidebar";
 import TopNav from "@/components/TopNav";
 import { getAvatarUrl } from "@/lib/user";
+import {
+  DEFAULT_TIMEZONE,
+  remainingDaysTz,
+  startOfDayInTz,
+} from "@/lib/timezone";
 
 export default async function Dashboard() {
   const supabase = await createClient();
@@ -20,23 +25,20 @@ export default async function Dashboard() {
     redirect("/login");
   }
 
-  const [{ data: txData }, { data: goalsData }, { data: budgetsData }] =
-    await Promise.all([
-      supabase
-        .from("transactions")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(500),
-      supabase
-        .from("savings_goals")
-        .select("*")
-        .order("created_at", { ascending: false }),
-      supabase.from("budgets").select("*"),
-    ]);
+  const [{ data: txData }, { data: goalsData }] = await Promise.all([
+    supabase
+      .from("transactions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500),
+    supabase
+      .from("savings_goals")
+      .select("*")
+      .order("created_at", { ascending: false }),
+  ]);
 
   const transactions = txData ?? [];
   const goals = goalsData ?? [];
-  const budgets = budgetsData ?? [];
 
   const now = new Date();
   const thisYear = now.getFullYear();
@@ -81,19 +83,21 @@ export default async function Dashboard() {
 
   const totalBalance = totalIncome - totalExpense;
 
-  const daysInMonth = new Date(thisYear, thisMonth + 1, 0).getDate();
-  const totalBudget = budgets.reduce(
-    (sum, b) => sum + Number(b.limit_amount),
-    0
-  );
-  const dailyLimit = totalBudget > 0 ? totalBudget / daysInMonth : 0;
+  const timeZone =
+    (typeof user.user_metadata?.timezone === "string" &&
+      user.user_metadata.timezone) ||
+    DEFAULT_TIMEZONE;
 
-  const startOfToday = new Date(thisYear, thisMonth, now.getDate());
+  const remainingDays = remainingDaysTz(now, timeZone);
+  const startOfToday = startOfDayInTz(now, timeZone);
+
   let todaySpent = 0;
   for (const t of transactions) {
     if (t.type !== "expense") continue;
     if (new Date(t.created_at) >= startOfToday) todaySpent += Number(t.amount);
   }
+
+  const dailyLimit = remainingDays > 0 ? totalBalance / remainingDays : 0;
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-on-background antialiased">
@@ -118,7 +122,10 @@ export default async function Dashboard() {
             </div>
             <DailySpendingBanner
               todaySpent={todaySpent}
+              remainingBalance={totalBalance}
+              remainingDays={remainingDays}
               dailyLimit={dailyLimit}
+              timezone={timeZone}
             />
             <BalanceCards
               totalBalance={totalBalance}
